@@ -31,14 +31,13 @@ Download the [RWC Dataset](https://zenodo.org/records/17170844) and place it in 
   - `./experiments/synthesizer-assessment/config.yaml`
 - Edit these files to customize the experiments.
 
-
 ## Experiments
 
 1. Preprocess the RWC samples:
     ```bash
-    python ./data/preprocess_RWC.py --your_RWC_dataset_path
+    python ./data/RWC/preprocess_RWC.py --your_RWC_dataset_path
     ```
-    This will split the RWC audio files into single notes samples available in `./data/RWC/`, then compute the embeddings (CLAP, CLAP Music, VGGish and MERT) and save them in `./data/embeddings/`.
+    This will split the RWC audio files into single notes samples available in `./data/RWC/RWC_preprocessed/`, then compute the embeddings (CLAP, CLAP Music, VGGish and MERT) and save them in `./data/embeddings/`.
 
 2. Launch the timbre-model pipeline to train the models
     ```bash

@@ -1,0 +1,6 @@
+embeddings_type: ["clap", "clap-music", "vggish", "mert"]
+model_hidden_layers: [
+  [],
+  [256],
+  [256, 128]
+]
