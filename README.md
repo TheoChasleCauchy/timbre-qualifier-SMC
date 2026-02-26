@@ -12,21 +12,30 @@
 
 2. Create a virtual environment (optional)
    ```bash
+   # If you use uv (Recommended)
+   uv sync
+
+   # If you don't use uv
+   # Make sure you have an installed Python version between 3.11 and 3.12 
    python -m venv venv
+   pip install . 
+
    source venv/bin/activate  # Linux/Mac
    venv\Scripts\activate      # Windows
    ```
 
-2. Install requirements:
+3. Install requirements:
     ```bash
-    pip install .
+    uv sync # If you use uv (Recommended)
+    pip install . 
     ```
 
 ## Dataset
 Download the [RWC Dataset](https://zenodo.org/records/17170844) and place it in `./data/RWC/`.
 
 ## Configuration
-- Experiment parameters (e.g., models architectures, embeddings used, training parameters) are defined in:
+- Experiment parameters (e.g., train-valid split, models architectures, embeddings used, training parameters) are defined in:
+  - `./data/RWC/metadata/split_config.yaml`
   - `./experiments/timbre-model/config.yaml`
   - `./experiments/synthesizer-assessment/config.yaml`
 - Edit these files to customize the experiments.

@@ -20,3 +20,6 @@ dependencies = [
     "soundfile",
     "mido",
 ]
+
+[tool.setuptools.packages.find]
+exclude = ["data*", "results*", "experiments*", "process_RWC*", "models*"]  # Exclude non-package directories
