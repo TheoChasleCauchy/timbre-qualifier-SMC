@@ -45,16 +45,19 @@ def split_metadata():
     Load the embeddings metadata files and split them into train and validation sets based on indices from "split_config.yaml".
     Save the results as two CSV files with prefixes "train" and "valid".
     """
+
+    print("[INFO] Splitting metadata files.")
+
     for embedding_type in ["clap", "clap-music", "vggish", "mert"]:
         # Load the split indices from the YAML file
-        with open("split_config.yaml", "r") as f:
+        with open("data/metadata/split_config.yaml", "r") as f:
             split_config = yaml.safe_load(f)
 
         train_indices = split_config["train_indices"]
         valid_indices = split_config["valid_indices"]
 
         # Load metadata CSV file
-        csv_path = f"data/RWC/metadata/{embedding_type}/{embedding_type}_embeddings_labels.csv"
+        csv_path = f"data/metadata/RWC/{embedding_type}/{embedding_type}_embeddings_labels.csv"
         df = pd.read_csv(csv_path)
 
         # Split the data

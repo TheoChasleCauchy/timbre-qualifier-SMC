@@ -2,6 +2,9 @@ import pandas as pd
 import os
 
 def create_embeddings_metadata():
+
+    print("[INFO] Creating embeddings metadata.")
+
     for embedding_type in ["clap", "clap-music", "mert", "vggish"]:
         samples_metadata = "data/metadata/RWC/RWC_metadata.csv"
 

@@ -4,17 +4,19 @@ import os
 from tqdm import tqdm
 import torch
 
-RWC_metadata_path = "data/RWC/metadata/RWC_metadata.csv"
-
-RWC_metadata = pd.read_csv(RWC_metadata_path)
-
 def compute_embeddings():
+
+    print("[INFO] Computing embeddings for RWC samples.")
+
+    RWC_metadata_path = "data/metadata/RWC/RWC_metadata.csv"
+
+    RWC_metadata = pd.read_csv(RWC_metadata_path)
 
     # Get audios paths and embeddings saving paths
     samples_paths = []
     save_paths = []
-    for path, instrument in zip(RWC_metadata["Path"], RWC_metadata["Instrument"]):
-        full_path = f"./resources/RWC/Dataset/{path}"
+    for path in RWC_metadata["Path"]:
+        full_path = f"data/RWC/RWC-preprocessed/{path}"
         samples_paths.append(full_path)
         path = path.replace('/', '_').replace('.wav', '')
         save_paths.append(f"{path}_embedding.pt")

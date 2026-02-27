@@ -4,6 +4,7 @@ import librosa
 import numpy as np
 import soundfile as sf
 import re
+from tqdm import tqdm
 
 dataset_dir = "data/RWC/RWC-I/"
 output_base_dir = "data/RWC/RWC-preprocessed/"
@@ -152,6 +153,9 @@ def safe_semitone_range(min_note, max_note):
 ################# MAIN #################
 
 def preprocess_RWC():
+
+    print("[INFO] Preprocessing RWC dataset.")
+
     file_path = os.path.join(dataset_dir, "02_instruments_details_en.csv")
 
     df = pd.read_csv(file_path, sep=",")
@@ -272,7 +276,7 @@ def preprocess_RWC():
 
     note_rows = []
 
-    for idx, row in df.iterrows():
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc="Processing files"):
         filename = row["File name"]
         note_range = row["Semitone range"]
         instr_name = row["Instrument name"]    
@@ -313,7 +317,7 @@ def preprocess_RWC():
                     "Instrument name": instr_name
                 })
 
-            print(f"Processed {filename} {output_dir} ({len(notes)} notes, {note_range} expected)")
+            # print(f"Processed {filename} {output_dir} ({len(notes)} notes, {note_range} expected)")
 
         except Exception as e:
             print(f"[ERROR] {filename}: {e}")

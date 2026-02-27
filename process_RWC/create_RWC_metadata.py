@@ -3,11 +3,14 @@ import os
 from tqdm import tqdm
 
 def create_RWC_metadata():
+
+    print("[INFO] Creating RWC metadata.")
+
     qualities_ground_truth = pd.read_csv("data/Reymore/timber_traits_ground_truth.csv")
     unique_instruments = qualities_ground_truth["RWC Name"].unique()
     qualities_names = qualities_ground_truth.columns[2:]  # Skip "RWC Name" and "Instrument" columns
 
-    rwc_dataset_path = "data/RWC/RWC_preprocessed"
+    rwc_dataset_path = "data/RWC/RWC-preprocessed"
 
     metadata = {"Path": [], "Instrument": [], **{quality: [] for quality in qualities_names}}
 

@@ -6,8 +6,8 @@ from samples_to_embeddings import compute_embeddings
 
 
 def main():
-    preprocess_RWC()
-    create_RWC_metadata()
+    # preprocess_RWC()
+    # create_RWC_metadata()
     compute_embeddings()
     create_embeddings_metadata()
     split_metadata()
