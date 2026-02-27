@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Predicting Timbre Traits for Interpretable Assessment of Musical Sound Synthesizers</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <style>
+    audio.sample_audio {
+      width: 200px;
+      max-width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Title and Authors -->
+  <div id="header" class="container text-center my-4">
+    <h1>Predicting Timbre Traits for Interpretable Assessment of Musical Sound Synthesizers</h1>
+    <p class="mt-3 mb-1"><strong>Théo Chasle Cauchy, Modan Tailleur, Mathieu Lagrange, Lindsay Reymore, Fanny Roche</strong></p>
+    <p>Contact: <a href="mailto:theo.chasle-cauchy@ls2n.fr">theo.chasle-cauchy@ls2n.fr</a></p>
+  </div>
+
+  <!-- Abstract -->
+  <div class="container">
+    <h2>Abstract</h2>
+    <p>
+      Automatic timbre qualification remains a challenging task in music information retrieval due to its inherently multi-dimensional and perceptual nature. While traditional signal processing methods and recent deep learning approaches have advanced the field, they often fail to establish a clear link between computed features and human perception. Reymore established timber traits profiles for orchestra instruments asking 243 musicians to rate 20 meaningful perceptual attributes. In this paper, we introduce a multi-layer perceptron model that predicts timber traits profiles using deep neural embeddings of instrument samples.
+      We evaluate its performance and analyze errors, then demonstrate its utility by assessing the synthesis quality of the advanced sound synthesizer TokenSynth. Our results show promising accuracy in predicting perceptual attributes, with potential applications in improving the realism of synthesized sounds and aiding musicologists in instrument analysis.  Our approach bridges the gap between computational models and perceptual timbre attributes, offering a novel framework for both research and practical applications in music technology.
+    </p>
+    <p>This is the companion page for the paper: Predicting Timbre Traits for Interpretable Assessment of Musical Sound Synthesizers</p>
+    <pre>Please, cite as:
+@article{chaslecauchy2026timbre,
+    title={Timbre Trait Prediction for Performance Analysis of Musical Sound Synthesizer using Deep Neural Embeddings},
+    author={Chasle Cauchy, Théo et al.},
+    journal={Journal of Sound and Music Computing},
+    year={2026}
+}
+    </pre>
+    <p>Experience code is available in <a href="https://github.com/TheoChasleCauchy/timbre-qualifier-SMC">this GitHub repository</a>.</p>
+
+  </div>
+
+  <!-- Error Analysis -->
+  <div class="container mt-5" id="table_techniques">
+    <h2>Error Analysis</h2>
+    <!-- <p>Below, the voice extracts generated from the different methods on two audio files: <code>61-70968-0035__11_004030.wav</code> and <code>01_005499.wav</code>.</p>
+
+    <table class="table table-responsive">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>Speech+Siren</th>
+          <th>Speech+Music</th>
+          <th>Speech+Chainsaw</th>
+          <th>Dog</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+            <td><strong>Original audio</strong></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0035__11_004030.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0054__29_016872.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/672-122797-0013__27_003443.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/01_005499.wav" type="audio/wav"></audio></td>
+        </tr>
+        <tr>
+          <td>Cohen-Adria et al.</td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0035__11_004030_cohen.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0054__29_016872_cohen.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/672-122797-0013__27_003443_cohen.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/01_005499_cohen.wav" type="audio/wav"></audio></td>
+        </tr>
+        <tr>
+          <td>Burkhardt et al.</td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0035__11_004030_burkhardt.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0054__29_016872_burkhardt.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/672-122797-0013__27_003443_burkhardt.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/01_005499_burkhardt.wav" type="audio/wav"></audio></td>
+        </tr>
+        <tr>
+          <td>Ours (Conv-TasNet)</td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0035__11_004030_ours_envss.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0054__29_016872_ours_envss.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/672-122797-0013__27_003443_ours_envss.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/01_005499_ours_envss.wav" type="audio/wav"></audio></td>
+        </tr>
+        <tr>
+            <td><strong>Ours</strong></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0035__11_004030_ours.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/61-70968-0054__29_016872_ours.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/672-122797-0013__27_003443_ours.wav" type="audio/wav"></audio></td>
+          <td><audio controls class="sample_audio"><source src="example_audio/01_005499_ours.wav" type="audio/wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+
+  <!-- <div class="container mt-3">
+    <p>As you can hear, since the dog audio resembles speech, the source separation and VAD do not produce perfect results in our method. However, you can hear that it preserves the sound scene better than the other methods.</p>
+  </div></div> -->
+
+  <!-- Pause other audio elements when one is played -->
+  <script>
+    function setupCallback(elem, elems) {
+      elem.addEventListener("play", function () {
+        for (var other of elems) {
+          if (other !== elem) {
+            other.pause();
+          }
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var elems = document.body.getElementsByTagName("audio");
+      for (var elem of elems) {
+        setupCallback(elem, elems);
+      }
+    });
+  </script>
+
+</body>
+</html>

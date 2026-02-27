@@ -113,6 +113,9 @@ Results are saved in the `./results/` directory:
 - `timbre-model/figures/`: Generated figures.
 - `synth/metrics/`: Synthesizer assessment predictions and metrics.
 
+## Companion page
+Please check the companion page for audio examples: https://theochaslecauchy.github.io/timbre-qualifier-SMC/
+
 ## Citation
 If you use this code, please cite our paper:
 ```bibtex
