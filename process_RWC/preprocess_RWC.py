@@ -275,7 +275,7 @@ def preprocess_RWC():
 
     note_rows = []
 
-    for idx, row in df.iterrows():
+    for idx, row in tqdm(df.iterrows(), total=len(df), desc="Spliting scales into individual notes"):
         filename = row["File name"]
         note_range = row["Semitone range"]
         instr_name = row["Instrument name"]    

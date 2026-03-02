@@ -18,7 +18,7 @@ def create_embeddings_metadata():
         embeddings_metadata["Path"] = embeddings_metadata["Path"].apply(lambda x: f"data/RWC/embeddings/{embedding_type}_embeddings/{x.replace('/', '_').replace('.wav', '')}_embedding.pt")
 
         # Save the result to a new CSV file
-        output_dir = f"data/metadata/RWC/{embedding_type}"
+        output_dir = f"data/metadata/RWC/{embedding_type}_embeddings"
         os.makedirs(output_dir, exist_ok=True)
         embeddings_metadata.to_csv(f"{output_dir}/{embedding_type}_embeddings_labels.csv", index=False)
 

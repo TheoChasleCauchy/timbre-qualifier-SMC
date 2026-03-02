@@ -45,14 +45,14 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
         train_dataset, train_dataloader = SamplesDataset.create_dataloader(train_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument)
         valid_dataset, valid_dataloader = SamplesDataset.create_dataloader(valid_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument)
 
-        model = TimbreMLP(input_size, hidden_layers, output_size)
         model_save_path = os.path.join(model_save_folder, f"timbre_model_{embeddings_type}_{hidden_layer_suffix}_{excluded_instrument.replace(' ', '_')}")
-        model.train_model(train_dataloader=train_dataloader, valid_dataloader=valid_dataloader, learning_rate=learning_rate, patience=patience, model_save_path=model_save_path)
+        model = TimbreMLP(input_size, hidden_layers, output_size, save_path=model_save_path)
+        model.train_model(train_dataloader=train_dataloader, valid_dataloader=valid_dataloader, learning_rate=learning_rate, patience=patience)
 
 
 def train_all_models():
     # Load config.yaml
-    with open("experiments/timbre-model/config.yaml", "r") as f:
+    with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     embeddings_type = config["embeddings_type"]
