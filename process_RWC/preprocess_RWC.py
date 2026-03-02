@@ -258,7 +258,6 @@ def preprocess_RWC():
         "Pitch range", "Number of JPEG files", "File length"
     ]]
 
-
     df[["Pitch min", "Pitch max"]] = df["Pitch range"].apply(safe_split_pitch_range)
 
     df = df.drop_duplicates(subset="File name", keep="first")
@@ -276,7 +275,7 @@ def preprocess_RWC():
 
     note_rows = []
 
-    for idx, row in tqdm(df.iterrows(), total=len(df), desc="Processing files"):
+    for idx, row in df.iterrows():
         filename = row["File name"]
         note_range = row["Semitone range"]
         instr_name = row["Instrument name"]    
@@ -306,9 +305,22 @@ def preprocess_RWC():
             # For multi-note files, adjust threshold to match note_range
             threshold = 70
             notes, sr = split_into_notes(full_path, base_name, top_db=threshold)
+            note_lengths = [len(note_array)/sr for note_array, _ in notes]
+            
+            # If the audio is too long (15s for a note), it means we didn't split enough, 
+            # so we lower the threshold to be more aggressive in splitting
+            while any(length > 15 for length in note_lengths):
+                threshold -= 5
+                notes, sr = split_into_notes(full_path, base_name, top_db=threshold)
+                note_lengths = [len(note_array)/sr for note_array, _ in notes]
 
             # Save the split notes
             for note_array, note_filename in notes:
+                if len(note_array)/sr > 15:
+                    print(filename)
+                    print(note_filename)
+                    print(len(note_array)/sr)
+
                 out_path = os.path.join(output_dir, note_filename)
                 sf.write(out_path, note_array, sr)
 
