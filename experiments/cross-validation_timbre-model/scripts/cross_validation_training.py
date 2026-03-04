@@ -6,7 +6,7 @@ import os
 from samples_dataset import SamplesDataset
 from timbre_mlp import TimbreMLP
 
-def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patience):
+def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patience, epochs):
     embeddings_type = embeddings_type + "_embeddings"
     
     # Load train and valid datasets metadata
@@ -47,7 +47,7 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
 
         model_save_path = os.path.join(model_save_folder, f"timbre_model_{embeddings_type}_{hidden_layer_suffix}_{excluded_instrument.replace(' ', '_')}")
         model = TimbreMLP(input_size, hidden_layers, output_size, save_path=model_save_path)
-        model.train_model(train_dataloader=train_dataloader, valid_dataloader=valid_dataloader, learning_rate=learning_rate, patience=patience)
+        model.train_model(train_dataloader=train_dataloader, valid_dataloader=valid_dataloader, learning_rate=learning_rate, patience=patience, epochs=epochs)
 
 
 def train_all_models():
@@ -60,7 +60,8 @@ def train_all_models():
     learning_rate = config["learning_rate"]
     batch_size = config["batch_size"]
     patience = config["patience"]
+    epochs = config["epochs"]
 
     for emb_type in embeddings_type:
         for hidden_layers_conf in model_hidden_layers:
-            train_model(emb_type, hidden_layers_conf, learning_rate, batch_size, patience)
+            train_model(emb_type, hidden_layers_conf, learning_rate, batch_size, patience, epochs)

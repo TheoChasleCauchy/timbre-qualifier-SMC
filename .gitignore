@@ -1,5 +1,6 @@
 data/RWC/
 data/metadata/RWC
+models
 
 # uv files
 uv.lock
