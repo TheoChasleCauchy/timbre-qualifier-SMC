@@ -6,12 +6,13 @@ from scipy.stats import pearsonr
 from tqdm import tqdm
 import yaml
 
-def compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix):
+def compute_predictions(embeddings_type, hidden_layers_conf, hidden_layers_suffix):
+    print(f"Computing Timber Traits Predictions with the models trained on {embeddings_type} with {hidden_layers_suffix}")
 
     output_size = 20 # 20 timber traits
 
     # Model structure
-    match embedding_type:
+    match embeddings_type:
         case "clap_embeddings":
             input_size = 512
         case "clap-music_embeddings":
@@ -20,10 +21,12 @@ def compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix)
             input_size = 128
         case "mert_embeddings":
             input_size = 768
+        case _:
+            raise ValueError(f"Unsupported embedding type: {embeddings_type}")
     
-    model_save_folder = f"./models/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/"
+    model_save_folder = f"./models/cross-validation_timbre-model/timbre_model_{embeddings_type}_{hidden_layers_suffix}/"
     
-    dataset_path = f"data/metadata/RWC/{embedding_type}/{embedding_type}_labels.csv"
+    dataset_path = f"data/metadata/RWC/{embeddings_type}/{embeddings_type}_labels.csv"
     dataset = pd.read_csv(dataset_path)
     timbre_traits_names = dataset.columns[2:].tolist() 
     df = []
@@ -31,7 +34,7 @@ def compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix)
     # Compute the predicted values for each sample (row) of the dataset and add it to the dataFrame
     for row in tqdm(dataset.itertuples(index=False), total=len(dataset), desc="Computing predictions for all samples"):
         instrument = row.Instrument
-        model_save_path = os.path.join(model_save_folder, f"timbre_model_{embedding_type}_{hidden_layer_suffix}_{instrument.replace(' ', '_')}")
+        model_save_path = os.path.join(model_save_folder, f"timbre_model_{embeddings_type}_{hidden_layers_suffix}_{instrument.replace(' ', '_')}")
 
         model = TimbreMLP.load_model(
             f"{model_save_path}/timbre_mlp.pth",
@@ -50,11 +53,15 @@ def compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix)
             **{timber_trait: predicted_values[:,timber_trait_id].item() for timber_trait_id, timber_trait in enumerate(timbre_traits_names)}  # Skip first two columns (Sample and Instrument)
         })
     
+    save_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions.csv"
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     df = pd.DataFrame(df)
-    df.to_csv(f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv", index=False)
+    df.to_csv(save_path, index=False)
 
-def compute_errors(embedding_type, hidden_layer_suffix):
-    predictions_path = f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
+def compute_errors(embeddings_type, hidden_layers_suffix):
+    print(f"Computing absolute errors for the models trained on {embeddings_type} with hidden layers {hidden_layers_suffix}")
+
+    predictions_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions.csv"
 
     # Read the predictions CSV file
     predictions_df = pd.read_csv(predictions_path)
@@ -79,11 +86,13 @@ def compute_errors(embedding_type, hidden_layer_suffix):
             print(f"Warning: No ground truth found for instrument '{instrument}'")
 
     # Save the updated predictions with absolute differences
-    predictions_df.to_csv(f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions_absolute_errors.csv", index=False)
+    predictions_df.to_csv(f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions_absolute_errors.csv", index=False)
 
-def get_MAE_per_instrument(embedding_type, hidden_layer_suffix):
+def get_MAE_per_instrument(embeddings_type, hidden_layers_suffix):
 
-    absolute_errors_path = f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions_absolute_errors.csv"
+    print(f"Computing MAE for the models trained on {embeddings_type} with hidden layers {hidden_layers_suffix}")
+
+    absolute_errors_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions_absolute_errors.csv"
 
     # Read the predictions CSV file
     absolute_errors_df = pd.read_csv(absolute_errors_path)
@@ -119,25 +128,26 @@ def get_MAE_per_instrument(embedding_type, hidden_layer_suffix):
     cols.insert(1, cols.pop(cols.index("Average")))
     mae_df = mae_df[cols]
 
-    mae_df.to_csv(f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_maes_per_instrument.csv", index=False)
+    mae_df.to_csv(f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_maes_per_instrument.csv", index=False)
 
 def compute_correlation(embedding_types, model_hidden_layers):
-    print("Computing correlation...")
 
     corr_dict = {}
 
-    for embedding_type in embedding_types:
+    for embeddings_type in embedding_types:
         for hidden_layers_conf in model_hidden_layers:
             
             match len(hidden_layers_conf):
                 case 0:
-                    hidden_layer_suffix = "no_hidden_layers"
+                    hidden_layers_suffix = "no_hidden_layers"
                 case 1:
-                    hidden_layer_suffix = f"single_hidden_layer"
+                    hidden_layers_suffix = f"single_hidden_layer"
                 case _:
-                    hidden_layer_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
+                    hidden_layers_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
 
-            predictions_path = f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
+            print(f"Computing correlation for the models trained on {embeddings_type} with hidden layers {hidden_layers_suffix}")
+
+            predictions_path = f"experiments/cross-validation_timbre-model/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions.csv"
 
             # Read the predictions CSV file
             predictions_df = pd.read_csv(predictions_path)
@@ -173,10 +183,10 @@ def compute_correlation(embedding_types, model_hidden_layers):
                     corr_str = f"{corr:.3f} *"
                 case _:
                     corr_str = f"{corr:.3f}"
-            corr_dict[f"{embedding_type}_{hidden_layer_suffix}"] = corr_str
+            corr_dict[f"{embeddings_type}_{hidden_layers_suffix}"] = corr_str
 
     corr_df = pd.DataFrame(list(corr_dict.items()), columns=["Model", "Correlation"])
-    corr_df.to_csv(f"experiments/cross-validation_timbre-model/cross-validation_correlations_all_models.csv", index=False)
+    corr_df.to_csv(f"experiments/cross-validation_timbre-model/results/cross-validation_correlations_all_models.csv", index=False)
 
 def compute_predictions_metrics():
 
@@ -187,19 +197,20 @@ def compute_predictions_metrics():
     embeddings_types = config["embeddings_types"]
     model_hidden_layers = config["model_hidden_layers"]
 
-    for embedding_type in embeddings_types:
+    for embeddings_type in embeddings_types:
+        embeddings_type = embeddings_type + "_embeddings"
         for hidden_layers_conf in model_hidden_layers:
             
             match len(hidden_layers_conf):
                 case 0:
-                    hidden_layer_suffix = "no_hidden_layers"
+                    hidden_layers_suffix = "no_hidden_layers"
                 case 1:
-                    hidden_layer_suffix = f"single_hidden_layer"
+                    hidden_layers_suffix = f"single_hidden_layer"
                 case _:
-                    hidden_layer_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
+                    hidden_layers_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
 
-            compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix)
-            compute_errors(embedding_type, hidden_layers_conf)
-            get_MAE_per_instrument(embedding_type, hidden_layer_suffix)
+            compute_predictions(embeddings_type, hidden_layers_conf, hidden_layers_suffix)
+            compute_errors(embeddings_type, hidden_layers_suffix)
+            get_MAE_per_instrument(embeddings_type, hidden_layers_suffix)
     
     compute_correlation(embeddings_types, model_hidden_layers)

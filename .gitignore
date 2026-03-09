@@ -1,6 +1,7 @@
 data/RWC/
 data/metadata/RWC
 models
+experiments/cross-validation_timbre-model/results
 
 # uv files
 uv.lock

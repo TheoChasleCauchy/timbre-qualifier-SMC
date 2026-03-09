@@ -6,7 +6,7 @@ from timber_traits_predictions_radar_charts import plot_all_instruments_radar_ch
 def main():
     # train_all_models()
     compute_predictions_metrics()
-    plot_all_instruments_radar_charts()
+    # plot_all_instruments_radar_charts()
 
 
 if __name__ == "__main__":
