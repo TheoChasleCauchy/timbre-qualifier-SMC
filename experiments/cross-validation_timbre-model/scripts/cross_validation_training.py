@@ -55,13 +55,13 @@ def train_all_models():
     with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
-    embeddings_type = config["embeddings_type"]
+    embeddings_types = config["embeddings_types"]
     model_hidden_layers = config["model_hidden_layers"]
     learning_rate = config["learning_rate"]
     batch_size = config["batch_size"]
     patience = config["patience"]
     epochs = config["epochs"]
 
-    for emb_type in embeddings_type:
+    for emb_type in embeddings_types:
         for hidden_layers_conf in model_hidden_layers:
             train_model(emb_type, hidden_layers_conf, learning_rate, batch_size, patience, epochs)

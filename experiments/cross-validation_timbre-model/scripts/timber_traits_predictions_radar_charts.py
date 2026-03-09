@@ -1,4 +1,5 @@
 import pandas as pd
+from tqdm import tqdm
 import plotly.graph_objects as go
 import numpy as np
 import os
@@ -38,7 +39,7 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
     ratings_df = ratings_df[['Instrument'] + timber_traits_names]
     ground_truth_values_confidence_intervals = {}
 
-    for instrument in instruments_names:
+    for instrument in tqdm(instruments_names, desc=f"Computing radar charts for model trained on {embedding_type} with {hidden_layer_suffix}"):
         reymore_name = ground_truth_df[ground_truth_df['RWC Name'] == instrument]['Instrument'].iloc[0]
         instrument_ratings = ratings_df[ratings_df['Instrument'] == reymore_name]
 
@@ -51,11 +52,13 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
             ground_truth_values_confidence_intervals[instrument].append(predicted_values_confidence_interval)
         
         # Get ground truth values
-        ground_truth_values = ground_truth_df[ground_truth_df['Instrument'] == instrument].iloc[0][2:].values.tolist() # Skip the "Instrument" column
+        ground_truth_row = ground_truth_df[ground_truth_df['RWC Name'] == instrument]
+        ground_truth_values = ground_truth_row[timber_traits_names].values[0] # Skip the "Instrument" column
 
         # Extract predicted values for the selected instrument
-        predicted_values = predicted_values_df[predicted_values_df['Instrument'] == instrument].iloc[0][2:].values.tolist() # Skip the "Instrument" column
-        predicted_values = np.mean(predicted_values)
+        predicted_values_row = predicted_values_df[predicted_values_df['Excluded Instrument'] == instrument]
+        predicted_values = predicted_values_row[timber_traits_names].values # Skip the "Instrument" column
+        predicted_values = predicted_values * 6 + 1
 
         # Compute 95% confidence interval over the predicted_values
         std = np.std(predicted_values, axis=0)
@@ -153,6 +156,7 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
         print(f"Radar chart saved to {save_path}")
 
 def plot_all_instruments_radar_charts():
+    print("Plotting radar charts for all instruments...")
 
     # Load config.yaml
     with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:

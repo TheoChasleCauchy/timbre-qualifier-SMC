@@ -2,6 +2,7 @@ import pandas as pd
 import os
 from timbre_mlp import TimbreMLP
 from samples_dataset import SamplesDataset
+from scipy.stats import pearsonr
 from tqdm import tqdm
 import yaml
 
@@ -120,6 +121,63 @@ def get_MAE_per_instrument(embedding_type, hidden_layer_suffix):
 
     mae_df.to_csv(f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_maes_per_instrument.csv", index=False)
 
+def compute_correlation(embedding_types, model_hidden_layers):
+    print("Computing correlation...")
+
+    corr_dict = {}
+
+    for embedding_type in embedding_types:
+        for hidden_layers_conf in model_hidden_layers:
+            
+            match len(hidden_layers_conf):
+                case 0:
+                    hidden_layer_suffix = "no_hidden_layers"
+                case 1:
+                    hidden_layer_suffix = f"single_hidden_layer"
+                case _:
+                    hidden_layer_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
+
+            predictions_path = f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
+
+            # Read the predictions CSV file
+            predictions_df = pd.read_csv(predictions_path)
+
+            # Get the ground truth CSV
+            ground_truth_path = f"resources/metadata/qualities_ground_truth.csv"
+            ground_truth_df = pd.read_csv(ground_truth_path)
+            timber_traits_names = ground_truth_df.columns[2:]  # Skip first two columns (Instrument, RWC Name)
+
+            ground_truth_mapping = {}
+            for _, row in ground_truth_df.iterrows():
+                ground_truth_mapping[row["RWC Name"]] = row[timber_traits_names]  # Skip first two columns (Instrument, RWC Name)
+
+            instruments_predictions = predictions_df.groupby("Instrument")
+            instrument_mean_preds = {}
+            # Get average predictions for each instrument
+            for instrument, instrument_df in instruments_predictions:
+                instrument_mean_preds[instrument] = instrument_df[timber_traits_names].mean()  # Skip first two columns (Sample and Instrument)
+
+            # Compute correlation for each quality column
+            all_predictions = []
+            all_ground_truth_values = []
+            for instrument, _ in instruments_predictions:
+                ground_truth_values = ground_truth_mapping[instrument]
+                all_ground_truth_values.extend(ground_truth_values)
+                all_predictions.extend(instrument_mean_preds[instrument])
+
+            corr, p_value = pearsonr(all_predictions, all_ground_truth_values)
+            match p_value:
+                case p_value if p_value < 0.01:
+                    corr_str = f"{corr:.3f} **"
+                case p_value if p_value < 0.05:
+                    corr_str = f"{corr:.3f} *"
+                case _:
+                    corr_str = f"{corr:.3f}"
+            corr_dict[f"{embedding_type}_{hidden_layer_suffix}"] = corr_str
+
+    corr_df = pd.DataFrame(list(corr_dict.items()), columns=["Model", "Correlation"])
+    corr_df.to_csv(f"experiments/cross-validation_timbre-model/cross-validation_correlations_all_models.csv", index=False)
+
 def compute_predictions_metrics():
 
     # Load config.yaml
@@ -143,3 +201,5 @@ def compute_predictions_metrics():
             compute_predictions(embedding_type, hidden_layers_conf, hidden_layer_suffix)
             compute_errors(embedding_type, hidden_layers_conf)
             get_MAE_per_instrument(embedding_type, hidden_layer_suffix)
+    
+    compute_correlation(embeddings_types, model_hidden_layers)
