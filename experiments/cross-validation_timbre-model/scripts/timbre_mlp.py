@@ -50,12 +50,12 @@ class TimbreMLP(nn.Module):
         self,
         train_dataloader: DataLoader,
         valid_dataloader: DataLoader = None,
-        epochs: int = 100,
+        epochs: int = 500,
         learning_rate: float = 0.001,
         loss_fn=nn.MSELoss(),  # Default: MSE for regression
         optimizer_class=optim.Adam,
         plot_loss: bool = True,
-        patience: int = 10,  # Number of epochs to wait before stopping
+        patience: int = 20,  # Number of epochs to wait before stopping
         lr_scheduler_factor: float = 0.3,  # Factor by which the learning rate will be reduced
         lr_scheduler_patience: int = 5,  # Number of epochs with no improvement after which learning rate will be reduced
     ):
@@ -82,7 +82,7 @@ class TimbreMLP(nn.Module):
             # Training phase
             self.train()
             train_epoch_loss = 0.0
-            for batch_X, batch_y in tqdm(train_dataloader, desc=f"Training - Epoch {epoch+1}/{epochs}, train_loss: {train_loss_history[-1]:.4f}"):
+            for batch_X, batch_y in tqdm(train_dataloader, desc=f"Training - Epoch {epoch+1}/{epochs}, train_loss: {train_loss_history[-1]:.4f}, test_loss: {valid_loss_history[-1]:.4f}"):
                 batch_X, batch_y = batch_X.to(self.device), batch_y.to(self.device)
                 optimizer.zero_grad()
                 outputs = self(batch_X)

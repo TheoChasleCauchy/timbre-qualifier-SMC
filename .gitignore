@@ -1,5 +1,6 @@
 data/RWC/
 data/metadata/RWC
+data/CMTTP
 models
 experiments/cross-validation_timbre-model/results
 

@@ -132,9 +132,19 @@ def get_MAE_per_instrument(embeddings_type, hidden_layers_suffix):
 
 def compute_correlation(embedding_types, model_hidden_layers):
 
+    # Get the ground truth CSV
+    ground_truth_path = f"data/Reymore/timber_traits_ground_truth.csv"
+    ground_truth_df = pd.read_csv(ground_truth_path)
+    timber_traits_names = ground_truth_df.columns[2:]  # Skip first two columns (Instrument, RWC Name)
+
+    ground_truth_mapping = {}
+    for _, row in ground_truth_df.iterrows():
+        ground_truth_mapping[row["RWC Name"]] = row[timber_traits_names]  # Skip first two columns (Instrument, RWC Name)
+
     corr_dict = {}
 
     for embeddings_type in embedding_types:
+        embeddings_type = embeddings_type + "_embeddings"
         for hidden_layers_conf in model_hidden_layers:
             
             match len(hidden_layers_conf):
@@ -147,21 +157,12 @@ def compute_correlation(embedding_types, model_hidden_layers):
 
             print(f"Computing correlation for the models trained on {embeddings_type} with hidden layers {hidden_layers_suffix}")
 
-            predictions_path = f"experiments/cross-validation_timbre-model/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions.csv"
+            predictions_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embeddings_type}_{hidden_layers_suffix}/cross-validation_predictions.csv"
 
             # Read the predictions CSV file
             predictions_df = pd.read_csv(predictions_path)
 
-            # Get the ground truth CSV
-            ground_truth_path = f"resources/metadata/qualities_ground_truth.csv"
-            ground_truth_df = pd.read_csv(ground_truth_path)
-            timber_traits_names = ground_truth_df.columns[2:]  # Skip first two columns (Instrument, RWC Name)
-
-            ground_truth_mapping = {}
-            for _, row in ground_truth_df.iterrows():
-                ground_truth_mapping[row["RWC Name"]] = row[timber_traits_names]  # Skip first two columns (Instrument, RWC Name)
-
-            instruments_predictions = predictions_df.groupby("Instrument")
+            instruments_predictions = predictions_df.groupby("Excluded Instrument")
             instrument_mean_preds = {}
             # Get average predictions for each instrument
             for instrument, instrument_df in instruments_predictions:
@@ -184,6 +185,34 @@ def compute_correlation(embedding_types, model_hidden_layers):
                 case _:
                     corr_str = f"{corr:.3f}"
             corr_dict[f"{embeddings_type}_{hidden_layers_suffix}"] = corr_str
+    
+    # Compute correlation for CMTTP predictions
+    cmttp_predictions_path = "models/cross-validation_timbre-model/CMTTP/CMTTP_predictions.csv"
+    cmttp_predictions_df = pd.read_csv(cmttp_predictions_path)
+
+    cmttp_instruments_predictions = cmttp_predictions_df.groupby("Instrument")
+    cmttp_instrument_mean_preds = {}
+    # Get average predictions for each instrument
+    for instrument, instrument_df in cmttp_instruments_predictions:
+        cmttp_instrument_mean_preds[instrument] = instrument_df[timber_traits_names].mean()  # Skip first two columns (Sample and Instrument)
+
+    # Compute correlation for each quality column
+    cmttp_all_predictions = []
+    cmttp_all_ground_truth_values = []
+    for instrument, _ in cmttp_instruments_predictions:
+        cmttp_ground_truth_values = ground_truth_mapping[instrument]
+        cmttp_all_ground_truth_values.extend(cmttp_ground_truth_values)
+        cmttp_all_predictions.extend(cmttp_instrument_mean_preds[instrument])
+
+    cmttp_corr, cmttp_p_value = pearsonr(cmttp_all_predictions, cmttp_all_ground_truth_values)
+    match cmttp_p_value:
+        case cmttp_p_value if cmttp_p_value < 0.01:
+            cmttp_corr_str = f"{cmttp_corr:.3f} **"
+        case cmttp_p_value if cmttp_p_value < 0.05:
+            cmttp_corr_str = f"{cmttp_corr:.3f} *"
+        case _:
+            cmttp_corr_str = f"{cmttp_corr:.3f}"
+    corr_dict["CMTTP"] = cmttp_corr_str
 
     corr_df = pd.DataFrame(list(corr_dict.items()), columns=["Model", "Correlation"])
     corr_df.to_csv(f"experiments/cross-validation_timbre-model/results/cross-validation_correlations_all_models.csv", index=False)

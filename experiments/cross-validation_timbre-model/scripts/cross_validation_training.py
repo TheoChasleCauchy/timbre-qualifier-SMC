@@ -2,7 +2,6 @@ from tqdm import tqdm
 import pandas as pd
 import yaml
 import os
-
 from samples_dataset import SamplesDataset
 from timbre_mlp import TimbreMLP
 
@@ -15,7 +14,6 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
     train_dataset_metadata = pd.read_csv(train_dataset_path)
 
     instruments_names = train_dataset_metadata['Instrument'].unique()
-    timbre_traits_names = train_dataset_metadata.columns[2:].tolist() 
 
     # Model structure
     match embeddings_type:
@@ -42,8 +40,8 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
 
     for excluded_instrument in tqdm(instruments_names, total=len(instruments_names), desc=f"Training models for {embeddings_type} embeddings, {len(hidden_layers)} hidden layers"):
         # Cross-Validation: For each instrument one model is trained without its samples, and we evaluate the model on these samples
-        train_dataset, train_dataloader = SamplesDataset.create_dataloader(train_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument)
-        valid_dataset, valid_dataloader = SamplesDataset.create_dataloader(valid_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument)
+        _, train_dataloader = SamplesDataset.create_dataloader(train_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument, shuffle=True)
+        _, valid_dataloader = SamplesDataset.create_dataloader(valid_dataset_path, batch_size=batch_size, exclude_instrument=excluded_instrument, shuffle=False)
 
         model_save_path = os.path.join(model_save_folder, f"timbre_model_{embeddings_type}_{hidden_layer_suffix}_{excluded_instrument.replace(' ', '_')}")
         model = TimbreMLP(input_size, hidden_layers, output_size, save_path=model_save_path)

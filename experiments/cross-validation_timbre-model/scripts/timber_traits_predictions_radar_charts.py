@@ -5,7 +5,7 @@ import numpy as np
 import os
 import yaml
 
-def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder: str):
+def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder: str, verbose: bool = False):
     """
     Plot and save a radar chart comparing ground truth and predicted values for a given instrument.
 
@@ -22,11 +22,17 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
     # Get instruments names
     instruments_names = ground_truth_df['RWC Name'].tolist()
 
-    # Extract ground truth values for the selected instrument
-    timber_traits_names = ground_truth_df.columns[2:].tolist() # Get the names of the timber_traits (excluding the first column which is 'Instrument')
+    # Timber Traits Names in the order defined by Lindsey Reymore 
+    timber_traits_names = [
+        "sparkling-brilliant", "focused-compact", "pure-clear", "open",
+        "ringing-long_decay", "resonant-vibrant", "sustained-even", "soft-singing",
+        "watery-fluid", "muted-veiled", "hollow", "woody",
+        "airy-breathy", "nasal-reedy", "raspy-grainy", "rumbling-low",
+        "direct-loud", "percussive", "shrill-noisy", "brassy-metallic", "sparkling-brilliant" # Close the polygons
+        ]
 
     # Load predicted values
-    predicted_values_path = f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
+    predicted_values_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
     predicted_values_df = pd.read_csv(predicted_values_path)
 
     # Load human ratings to compute 95% confidence intervals
@@ -53,7 +59,7 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
         
         # Get ground truth values
         ground_truth_row = ground_truth_df[ground_truth_df['RWC Name'] == instrument]
-        ground_truth_values = ground_truth_row[timber_traits_names].values[0] # Skip the "Instrument" column
+        ground_truth_values = ground_truth_row[timber_traits_names].values[0].tolist() # Skip the "Instrument" column
 
         # Extract predicted values for the selected instrument
         predicted_values_row = predicted_values_df[predicted_values_df['Excluded Instrument'] == instrument]
@@ -66,6 +72,8 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
 
         # Mean predicted values for the selected instrument
         predicted_values = np.mean(predicted_values, axis=0)
+        predicted_values = np.append(predicted_values, predicted_values[0])  # Close the polygon
+        predicted_values_confidence_interval = np.append(predicted_values_confidence_interval, predicted_values_confidence_interval[0])  # Close the polygon
 
         # Create radar chart
         fig = go.Figure()
@@ -146,14 +154,17 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
                     xanchor="left",   # Anchor the legend to the left of its position
                     x=1.05,           # Position the legend just outside the right edge
                 ),
-            autosize=True # Disable autosize to use the specified dimensions
+            autosize=False, # Disable autosize to use the specified dimensions
+            width=900,
+            height=600
         )
 
         # Save the plot
         save_path = os.path.join(save_folder, f"radar_chart_excluded_instrument_{instrument.replace(' ', '_')}.png")
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         fig.write_image(save_path)
-        print(f"Radar chart saved to {save_path}")
+        if verbose:
+            print(f"Radar chart saved to {save_path}")
 
 def plot_all_instruments_radar_charts():
     print("Plotting radar charts for all instruments...")
@@ -166,6 +177,7 @@ def plot_all_instruments_radar_charts():
     model_hidden_layers = config["model_hidden_layers"]
 
     for embedding_type in embeddings_types:
+        embedding_type = embedding_type + "_embeddings"
         for hidden_layers_conf in model_hidden_layers:
             
             match len(hidden_layers_conf):
@@ -176,4 +188,4 @@ def plot_all_instruments_radar_charts():
                 case _:
                     hidden_layer_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
 
-            plot_radar_chart(embedding_type, hidden_layer_suffix, save_path=f"experiments/cross-validation_timbre-model/timbre_model_{embedding_type}_{hidden_layer_suffix}/")
+            plot_radar_chart(embedding_type, hidden_layer_suffix, save_folder=f"experiments/cross-validation_timbre-model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/")
