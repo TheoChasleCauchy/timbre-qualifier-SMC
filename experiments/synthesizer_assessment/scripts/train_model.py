@@ -5,17 +5,7 @@ import os
 from samples_dataset import SamplesDataset
 from timbre_mlp import TimbreMLP
 
-def train_model(embeddings_type, learning_rate, batch_size, patience, epochs):
-    # Load config.yaml
-    with open("experiments/synthesizer-assessment/config.yaml", "r") as f:
-        config = yaml.safe_load(f)
-
-    embeddings_type = config["embeddings_type"]
-    hidden_layers = config["model_hidden_layers"]
-    learning_rate = config["learning_rate"]
-    batch_size = config["batch_size"]
-    patience = config["patience"]
-    epochs = config["epochs"]
+def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patience, epochs):
 
     embeddings_type = embeddings_type + "_embeddings"
     
@@ -44,7 +34,7 @@ def train_model(embeddings_type, learning_rate, batch_size, patience, epochs):
 
     output_size = 20 # 20 timber traits
 
-    model_save_folder = f"models/synthesizer-assessment/timbre_model_{embeddings_type}_{hidden_layer_suffix}/"
+    model_save_folder = f"models/synthesizer_assessment/timbre_model_{embeddings_type}_{hidden_layer_suffix}/"
 
     # Cross-Validation: For each instrument one model is trained without its samples, and we evaluate the model on these samples
     _, train_dataloader = SamplesDataset.create_dataloader(train_dataset_path, batch_size=batch_size, shuffle=True)

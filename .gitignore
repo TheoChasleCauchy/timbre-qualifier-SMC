@@ -2,7 +2,8 @@ data/RWC/
 data/metadata/RWC
 data/CMTTP
 models
-experiments/cross-validation_timbre-model/results
+experiments/cross-validation_timbre_model/results
+experiments/synthesizer_assessment/results
 
 # uv files
 uv.lock

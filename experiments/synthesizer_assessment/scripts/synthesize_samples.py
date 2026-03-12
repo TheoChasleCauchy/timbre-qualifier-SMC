@@ -8,20 +8,21 @@ import os
 import yaml
 from utils import get_midi_range_from_instrument, instruments_caps_locked_prompts, midi_to_note
 
-# Initialize models
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-synth = TokenSynth.from_pretrained(aug=True, device=device)
-clap = CLAP(device=device)
-decoder = DACDecoder(device=device)
-
-qualities_ground_truth = pd.read_csv("data/Reymore/timber_traits_ground_truth.csv")
-instruments = qualities_ground_truth["RWC Name"].unique()
-
-def synthesize_audios(condition_type: str, embeddings_type: str, seed: int):
+def synthesize_audios(condition_type: str, seed: int):
 
     assert condition_type in ["text", "audio", "text_audio"], f"Invalid condition type: {condition_type}"
 
-    output_dir = f"data/TokenSynth/{condition_type}_conditioned_synthesis/"
+    # Initialize models
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    synth = TokenSynth.from_pretrained(aug=True, device=device)
+    clap = CLAP(device=device)
+    decoder = DACDecoder(device=device)
+
+    timbre_traits_ground_truth = pd.read_csv("data/Reymore/timber_traits_ground_truth.csv")
+    instruments = timbre_traits_ground_truth["RWC Name"].unique()
+
+    output_dir = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/"
+    os.makedirs(output_dir, exist_ok=True)
 
     for instrument in instruments:
 
@@ -58,12 +59,12 @@ def synthesize_audios(condition_type: str, embeddings_type: str, seed: int):
                         condition = clap.encode_text(instruments_caps_locked_prompts[instrument])
 
                     case "audio":
-                        embeddings_path = f"data/RWC/mean_embeddings/{embeddings_type}/"
+                        embeddings_path = f"data/RWC/mean_clap_embeddings/"
                         condition = torch.load(f"{embeddings_path}{instrument}_embedding.pt")
 
                     case "text_audio":
                         text_condition = clap.encode_text(instruments_caps_locked_prompts[instrument])
-                        embeddings_path = f"data/RWC/mean_embeddings/{embeddings_type}/"
+                        embeddings_path = f"data/RWC/mean_clap_embeddings/"
                         audio_condition = torch.load(f"{embeddings_path}{instrument}_embedding.pt")
                         condition = torch.mean(torch.stack([text_condition, audio_condition]), dim=0)
 
@@ -81,7 +82,7 @@ def synthesize_audios(condition_type: str, embeddings_type: str, seed: int):
 
 def synthesize_all(seed: int):
     # Load config.yaml
-    with open("experiments/synthesizer-assessment/config.yaml", "r") as f:
+    with open("experiments/synthesizer_assessment/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     embeddings_type = config["embeddings_type"]

@@ -37,7 +37,7 @@ Download the [RWC Dataset](https://zenodo.org/records/17170844) and place it in 
 - Experiment parameters (e.g., train-valid split, models architectures, embeddings used, training parameters) are defined in:
   - `data/RWC/metadata/split_config.yaml`
   - `experiments/timbre-model/config.yaml`
-  - `experiments/synthesizer-assessment/config.yaml`
+  - `experiments/synthesizer_assessment/config.yaml`
 - Edit these files to customize the experiments.
 
 ## Experiments
@@ -65,30 +65,30 @@ Download the [RWC Dataset](https://zenodo.org/records/17170844) and place it in 
 
 2. Launch the timbre-model pipeline to train the models
     ```bash
-    python experiments/cross-validation_timbre-model/scripts/main.py
+    python experiments/cross-validation_timbre_model/scripts/main.py
     ```
-    This will launch the training of all the models considering the parameters in `experiments/cross-validation_timbre-model/config.yaml` and will generate the results files and figures in the `experiments/cross-validation_timbre-model/results` folder.
+    This will launch the training of all the models considering the parameters in `experiments/cross-validation_timbre_model/config.yaml` and will generate the results files and figures in the `experiments/cross-validation_timbre_model/results` folder.
     
     **Pipeline**:
-    - Train each model with a cross-validation approach, saved in `models/cross-validation_timbre-model/`
-    - Compute the cross-validation predictions and metrics, saved in `experiments/cross-validation_timbre-model/results/`
-    - Generation of figures, saved in `experiments/cross-validation_timbre-model/results/figures/`
+    - Train each model with a cross-validation approach, saved in `models/cross-validation_timbre_model/`
+    - Compute the cross-validation predictions and metrics, saved in `experiments/cross-validation_timbre_model/results/`
+    - Generation of figures, saved in `experiments/cross-validation_timbre_model/results/figures/`
 
 
-3. Launch the synthesizer-assessment pipeline assess the synthesizer
+3. Launch the synthesizer_assessment pipeline assess the synthesizer
 
     ```bash
-    python experiments/synthesizer-assessment/main.py
+    python experiments/synthesizer_assessment/main.py
     ```
-    This first train a model on all instruments by specifing the parameters in the `experiments/synthesizer-assessment/config.yaml` file (by default the model is trained on CLAP emneddings with no hidden layers). Then it will launch the synthesis of audios with TokenSynth synthesizer then will assess it and will generate the results files and figures in the `results/` folder.
+    This first train a model on all instruments by specifing the parameters in the `experiments/synthesizer_assessment/config.yaml` file (by default the model is trained on CLAP emneddings with no hidden layers). Then it will launch the synthesis of audios with TokenSynth synthesizer then will assess it and will generate the results files and figures in the `results/` folder.
     
     **Pipeline**:
-    - Training of the model on all instruments saved in `models/synthesizer-assessment/`.
+    - Training of the model on all instruments saved in `models/synthesizer_assessment/`.
     - Computing of the mean embedding of RWC samples for each instrument `RWC/mean_embeddings/clap_embeddings/`.
     - Generation of midi files for each note in `data/TokenSynth/midi_files`
-    - Synthesis of the audio samples in `data/TokenSynth/{condition_type}_conditioned_synthesis/`.
-    - Computing of the embeddings, saved in `data/TokenSynth/clap_embeddings/`.
-    - Predictions, metrics and generated figures are saved in `experiments/synthesizer-assessment/results/`.
+    - Synthesis of the audio samples in `data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/`.
+    - Computing of the embeddings, saved in `data/TokenSynth/Embeddings/{condition_type}_conditioned/clap_embeddings/`.
+    - Predictions, metrics and generated figures are saved in `experiments/synthesizer_assessment/results/`.
 
 ## Reproducing Results
 To reproduce all results from the paper:
@@ -97,16 +97,16 @@ To reproduce all results from the paper:
 python data/preprocess_RWC.py --your_RWC_dataset_path
 
 # Train timbre models
-python experiments/timbre-model/main.py
+python experiments/cross-validation_timbre_model/main.py
 
 # Assess synthesizer
-python experiments/synthesizer-assessment/main.py
+python experiments/synthesizer_assessment/main.py
 ```
 
 ## Results
 Results are saved in the `results/` sub-directories of the experiments directories:
-- `experiments/cross-validation_timbre-model/results/`: Cross-validation predictions, metrics and generated figures.
-- `experiments/synthesizer-assessment/results/`: Predictions and metrics on synthesized samples.
+- `experiments/cross-validation_timbre_model/results/`: Cross-validation predictions, metrics and generated figures.
+- `experiments/synthesizer_assessment/results/`: Predictions and metrics on synthesized samples.
 
 ## Companion page
 Please check the companion page for audio examples: https://theochaslecauchy.github.io/timbre-qualifier-SMC/

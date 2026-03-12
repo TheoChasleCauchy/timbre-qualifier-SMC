@@ -50,12 +50,12 @@ def CMTTP():
                 trait_embedding = torch.load(f"data/CMTTP/timber_traits_embeddings/{trait}.pt", weights_only=True).to(device)
                 distance = torch.norm(sample_embedding - trait_embedding).item()
                 samples_traits_distances_df.loc[samples_traits_distances_df["Path"] == row["Path"], trait] = distance
-    os.makedirs("models/cross-validation_timbre-model/CMTTP", exist_ok=True)
-    samples_traits_distances_df.to_csv("models/cross-validation_timbre-model/CMTTP/samples_timber_traits_distances.csv", index=False)
+    os.makedirs("models/cross-validation_timbre_model/CMTTP", exist_ok=True)
+    samples_traits_distances_df.to_csv("models/cross-validation_timbre_model/CMTTP/samples_timber_traits_distances.csv", index=False)
 
     # Normalize all distances by the max distance of the dataframe
     samples_traits_distances_df[samples_traits_distances_df.columns[2:]] = samples_traits_distances_df[samples_traits_distances_df.columns[2:]].div(samples_traits_distances_df[samples_traits_distances_df.columns[2:]].max(axis=0), axis=1)
-    samples_traits_distances_df.to_csv("models/cross-validation_timbre-model/CMTTP/samples_timber_traits_distances.csv", index=False)
+    samples_traits_distances_df.to_csv("models/cross-validation_timbre_model/CMTTP/samples_timber_traits_distances.csv", index=False)
 
 
     # for each couple of traits, keep only the min value
@@ -66,13 +66,13 @@ def CMTTP():
             for trait in trait_tuple:
                 samples_traits_distances_refactored_df.drop(columns=[trait], inplace=True)
             samples_traits_distances_refactored_df[f"{'-'.join(trait_tuple)}"] = min_val
-    samples_traits_distances_refactored_df.to_csv("models/cross-validation_timbre-model/CMTTP/samples_timber_traits_distances_refactored.csv", index=False)
+    samples_traits_distances_refactored_df.to_csv("models/cross-validation_timbre_model/CMTTP/samples_timber_traits_distances_refactored.csv", index=False)
 
 
     # Inverse distances to get the score
     samples_traits_inversed_distances_df = samples_traits_distances_refactored_df.copy()
     samples_traits_inversed_distances_df[samples_traits_inversed_distances_df.columns[2:]] = 1 - samples_traits_inversed_distances_df[samples_traits_inversed_distances_df.columns[2:]]
-    samples_traits_inversed_distances_df.to_csv("models/cross-validation_timbre-model/CMTTP/CMTTP_predictions.csv", index=False)
+    samples_traits_inversed_distances_df.to_csv("models/cross-validation_timbre_model/CMTTP/CMTTP_predictions.csv", index=False)
 
 
     # Compute absolute errors for each trait and each sample
@@ -88,7 +88,7 @@ def CMTTP():
             # Normalize ground truth values
             ground_truth_value = (ground_truth_value - 1) / 6.0
             samples_traits_absolute_errors_df.loc[index, trait] = abs(predicted_value - ground_truth_value)
-    samples_traits_absolute_errors_df.to_csv("models/cross-validation_timbre-model/CMTTP/CMTTP_absolute_errors.csv", index=False)
+    samples_traits_absolute_errors_df.to_csv("models/cross-validation_timbre_model/CMTTP/CMTTP_absolute_errors.csv", index=False)
 
 
     average_metric = {}
@@ -111,4 +111,4 @@ def CMTTP():
     cols = df.columns.tolist()
     cols.insert(0, cols.pop(cols.index("Average")))
     df = df[cols]
-    df.to_csv("models/cross-validation_timbre-model/CMTTP/CMTTP_maes_per_instrument.csv", index=False)
+    df.to_csv("models/cross-validation_timbre_model/CMTTP/CMTTP_maes_per_instrument.csv", index=False)

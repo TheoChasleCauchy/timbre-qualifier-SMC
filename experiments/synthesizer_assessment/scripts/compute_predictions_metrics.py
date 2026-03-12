@@ -21,7 +21,7 @@ def compute_predictions(embeddings_type, model_hidden_layers, hidden_layers_suff
             raise ValueError(f"Unsupported embedding type: {embeddings_type}")
     output_size = 20 # 20 timber traits
     
-    model_save_path = f"models/synthesizer-assessment/timbre_model_{embeddings_type}_{hidden_layers_suffix}/"
+    model_save_path = f"models/synthesizer_assessment/timbre_model_{embeddings_type}_{hidden_layers_suffix}/"
     
     for condition_type in ["text_conditioned", "audio_conditioned", "text_audio_conditioned"]:
         dataset_path = f"resources/metadata/Synth/{condition_type}_embeddings_labels.csv"
@@ -125,7 +125,7 @@ def get_MAE_per_instrument():
 def compute_predictions_metrics():
 
     # Load config.yaml
-    with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:
+    with open("experiments/cross-validation_timbre_model/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     embeddings_type = config["embeddings_type"]

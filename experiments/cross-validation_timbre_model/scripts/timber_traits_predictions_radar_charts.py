@@ -32,7 +32,7 @@ def plot_radar_chart(embedding_type: str, hidden_layer_suffix: str, save_folder:
         ]
 
     # Load predicted values
-    predicted_values_path = f"experiments/cross-validation_timbre-model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
+    predicted_values_path = f"experiments/cross-validation_timbre_model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/cross-validation_predictions.csv"
     predicted_values_df = pd.read_csv(predicted_values_path)
 
     # Load human ratings to compute 95% confidence intervals
@@ -170,7 +170,7 @@ def plot_all_instruments_radar_charts():
     print("Plotting radar charts for all instruments...")
 
     # Load config.yaml
-    with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:
+    with open("experiments/cross-validation_timbre_model/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     embeddings_types = config["embeddings_types"]
@@ -188,4 +188,4 @@ def plot_all_instruments_radar_charts():
                 case _:
                     hidden_layer_suffix = f"{len(hidden_layers_conf)}_hidden_layers"
 
-            plot_radar_chart(embedding_type, hidden_layer_suffix, save_folder=f"experiments/cross-validation_timbre-model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/")
+            plot_radar_chart(embedding_type, hidden_layer_suffix, save_folder=f"experiments/cross-validation_timbre_model/results/timbre_model_{embedding_type}_{hidden_layer_suffix}/")

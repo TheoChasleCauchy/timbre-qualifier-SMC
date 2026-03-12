@@ -36,7 +36,7 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
 
     output_size = 20 # 20 timber traits
 
-    model_save_folder = f"models/cross-validation_timbre-model/timbre_model_{embeddings_type}_{hidden_layer_suffix}/"
+    model_save_folder = f"models/cross-validation_timbre_model/timbre_model_{embeddings_type}_{hidden_layer_suffix}/"
 
     for excluded_instrument in tqdm(instruments_names, total=len(instruments_names), desc=f"Training models for {embeddings_type} embeddings, {len(hidden_layers)} hidden layers"):
         # Cross-Validation: For each instrument one model is trained without its samples, and we evaluate the model on these samples
@@ -50,7 +50,7 @@ def train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patie
 
 def train_all_models():
     # Load config.yaml
-    with open("experiments/cross-validation_timbre-model/config.yaml", "r") as f:
+    with open("experiments/cross-validation_timbre_model/config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
     embeddings_types = config["embeddings_types"]
