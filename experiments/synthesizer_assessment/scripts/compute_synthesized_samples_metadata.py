@@ -1,10 +1,12 @@
 import os
 import pandas as pd
 
-def compute_synth_metadata(audios_folder: str, csv_name: str):
+def compute_synth_metadata():
 
     condition_types = ["text", "audio", "text_audio"]
     for condition_type in condition_types:
+
+        audios_folder = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/"
 
         # Initialize lists to store paths and instrument names
         paths = []
@@ -29,7 +31,8 @@ def compute_synth_metadata(audios_folder: str, csv_name: str):
         })
 
         # Write to CSV
-        os.makedirs("./resources/metadata/Synth/", exist_ok=True)
-        df.to_csv(f"./resources/metadata/Synth/{csv_name}", index=False)
+        output_dir = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/"
+        os.makedirs(output_dir, exist_ok=True)
+        df.to_csv(f"{output_dir}{condition_type}_metadata.csv", index=False)
 
-        print(f"CSV file saved as './resources/metadata/Synth/{csv_name}'")
+        print(f"Samples metadata file saved as '{output_dir}{condition_type}_metadata.csv'")

@@ -3,7 +3,10 @@ from train_model import train_model
 from compute_mean_embeddings_RWC import compute_mean_embeddings
 from create_midi_files import create_midi_files
 from synthesize_samples import synthesize_all
+from compute_synthesized_samples_metadata import compute_synth_metadata
 from compute_synthesized_samples_embeddings import compute_embeddings
+from compute_embeddings_metadata import compute_synthesized_samples_embeddings_metadata
+from compute_predictions_metrics import compute_predictions_metrics
 import random
 import numpy as np
 import torch
@@ -30,9 +33,10 @@ def main():
     # compute_mean_embeddings()
     # create_midi_files()
     synthesize_all(seed)
-    ##### Compute metadata
-    # compute_embeddings(embeddings_type)
-    #### COmpute predictions, metrics and figures
+    compute_synth_metadata()
+    compute_embeddings(embeddings_type)
+    compute_synthesized_samples_embeddings_metadata()
+    compute_predictions_metrics(embeddings_type, hidden_layers)
 
 if __name__ == "__main__":
     main()
