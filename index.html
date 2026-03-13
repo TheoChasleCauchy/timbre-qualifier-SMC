@@ -34,7 +34,7 @@
   <!-- Title and Authors -->
   <div id="header" class="container text-center my-4">
     <h1>Predicting Timbre Traits for Interpretable Assessment of Musical Sound Synthesizers</h1>
-    <p class="mt-3 mb-1"><strong>Théo Chasle Cauchy, Modan Tailleur, Mathieu Lagrange, Lindsay Reymore, Fanny Roche</strong></p>
+    <p class="mt-3 mb-1"><strong>Théo Chasle Cauchy, Modan Tailleur, Lindsay Reymore, Fanny Roche, Mathieu Lagrange</strong></p>
     <p>Contact: <a href="mailto:theo.chasle-cauchy@ls2n.fr">theo.chasle-cauchy@ls2n.fr</a></p>
   </div>
 
@@ -64,6 +64,10 @@
     <h3>Synthesized Wood Block assessment</h3>
     <p>We start the analysis of the synthesis by observing the predicted TTP of the instrument with the highest MAE, here, the wood block.</p>
 
+    <div>
+      <img src="data/audio_examples/WOOD_BLOCK_radar.jpg" alt="Radar plots of TTP for Wood Block with their respective 95% confidence interval for Reymore's results (Green); Averaged predicted TTP on synthesized wood block samples (Blue); Predicted TTP of the sample with highest difference between 'percussive' prediction and ground truth (Red).">
+    </div>
+    <p>We observe on the wood block averaged predicted TTP that the timbre traits with the highest errors are 'woody' and 'percussive'. While 'woody' can hardly be assessed on a spectrogram, we can make observations with respect to the 'percussive' trait.</p>
     <!-- First Sound and Image -->
     <div class="double-audios-container">
         <div class="sound-image">
@@ -83,11 +87,45 @@
             Your browser does not support the audio element.
         </audio>
         <div>
-            <img src="data/audio_examples/WOOD_BLOCK_ground_truth_furthest_neighbor_trait_percussive_dist_0.61_sample_95_note_E4.jpg" alt="synthesized wood block sample with the highest difference between predicted 'percussive' value and ground truth">
+            <img src="data/audio_examples/WOOD_BLOCK_ground_truth_furthest_neighbor_trait_percussive_dist_0.61_sample_95_note_E4.jpg" alt="Synthesized wood block sample with the highest difference between predicted 'percussive' value and ground truth">
         </div>
     </div>
 
-  <!-- Pause other audio elements when one is played -->
+    <p>The wood block is a percussive instrument, so its ground truth value of the 'percussive' trait is about 0.93. The prediction of this trait for the synthesized sample is 0.32. We can observe on the spectrograms that the synthesized sample is sustained, contrary to the RWC sample, which decays quickly after impact. This explains why its 'percussive' trait prediction is far below the ground truth. </p>
+
+    <h3>Synthesized Cello assessment</h3>
+    <p>We can also analyze more subtle defects by observing any timber trait of a any instrument. For instance, we can analyze the 'resonant/vibrant' trait of the cello.</p>
+
+    <div>
+      <img src="data/audio_examples/CELLO_radar.jpg" alt="Radar plots of TTP for Cello with their respective 95% confidence interval for Reymore's results (Green); Averaged predicted TTP on synthesized cello samples (Blue); Predicted TTP of the sample with highest difference between 'resonant-vibrant' prediction and ground truth (Red).">
+    </div>
+    <p>We observe on the wood block averaged predicted TTP that the timbre traits with the highest errors are 'woody' and 'percussive'. While 'woody' can hardly be assessed on a spectrogram, we can make observations with respect to the 'percussive' trait.</p>
+    <!-- First Sound and Image -->
+    <div class="double-audios-container">
+        <div class="sound-image">
+            <audio controls>
+                <source src="data/audio_examples/CELLO_ground_truth_nearest_neighbor_trait_resonant-vibrant_dist_0.03_171VCNOF_64.wav" type="audio/mpeg">
+                Your browser does not support the audio element.
+            </audio>
+            <div>
+            <img src="data/audio_examples/CELLO_ground_truth_nearest_neighbor_trait_resonant-vibrant_dist_0.03_171VCNOF_64.jpg" alt="RWC cello sample with the lowest difference between predicted 'resonant-vibrant' value and ground truth.">
+        </div>
+    </div>
+
+    <!-- Second Sound and Image -->
+    <div class="sound-image">
+        <audio controls>
+            <source src="data/audio_examples/CELLO_ground_truth_furthest_neighbor_trait_resonant-vibrant_dist_0.22_sample_35_note_G3.wav" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div>
+            <img src="data/audio_examples/CELLO_ground_truth_furthest_neighbor_trait_resonant-vibrant_dist_0.22_sample_35_note_G3.jpg" alt="Synthesized cello sample with the highest difference between predicted 'resonant-vibrant' value and ground truth">
+        </div>
+    </div>
+
+    <p>The 'resonant/vibrant' ground truth value of the cello is 0.865, the highest value for this trait in the 31 instruments considered here, suggesting it is an essential timbral quality for the cello. The prediction of this trait for the synthesized sample is 0.66. The spectrogram of the RWC sample shows harmonics whose frequencies fluctuate slightly over time, plausibly creating a 'vibrant' perceptual quality related to the pronounced vibrato in the sample. In contrast, the synthesized sample's spectrogram lacks these frequency oscillations in its harmonics. This difference helps explain why the synthesized sample receives a lower prediction score for the 'resonant/vibrant' attribute.</p>
+  
+    <!-- Pause other audio elements when one is played -->
   <script>
     function setupCallback(elem, elems) {
       elem.addEventListener("play", function () {
