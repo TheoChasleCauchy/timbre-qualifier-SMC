@@ -1,12 +1,12 @@
 import pandas as pd
 import os
 
-def compute_synthesized_samples_embeddings_metadata(condition_type: str, embeddings_type: str):
+def compute_synthesized_samples_embeddings_metadata(embeddings_type: str):
     
     condition_types = ["text", "audio", "text_audio"]
     for condition_type in condition_types:
 
-        samples_metadata = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/{condition_type}_metadata.csv"
+        samples_metadata = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/{condition_type}_conditioned_synthesis_metadata.csv"
 
         # Read the samples metadata CSV file
         samples_df = pd.read_csv(samples_metadata)

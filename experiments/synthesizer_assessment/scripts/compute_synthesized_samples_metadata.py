@@ -33,6 +33,6 @@ def compute_synth_metadata():
         # Write to CSV
         output_dir = f"data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/"
         os.makedirs(output_dir, exist_ok=True)
-        df.to_csv(f"{output_dir}{condition_type}_metadata.csv", index=False)
+        df.to_csv(f"{output_dir}{condition_type}_conditioned_synthesis_metadata.csv", index=False)
 
-        print(f"Samples metadata file saved as '{output_dir}{condition_type}_metadata.csv'")
+        print(f"Samples metadata file saved as '{output_dir}{condition_type}_conditioned_synthesis_metadata.csv'")
