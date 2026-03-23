@@ -88,7 +88,8 @@ Download the [RWC Dataset](https://zenodo.org/records/17170844) and place it in 
     - Generation of midi files for each note in `data/TokenSynth/midi_files`
     - Synthesis of the audio samples in `data/TokenSynth/Samples/{condition_type}_conditioned_synthesis/`.
     - Computing of the embeddings, saved in `data/TokenSynth/Embeddings/{condition_type}_conditioned/clap_embeddings/`.
-    - Predictions, metrics and generated figures are saved in `experiments/synthesizer_assessment/results/`.
+    - Predictions, metrics and generated tables are saved in `experiments/synthesizer_assessment/results/`.
+    - Nearest and Furthest Neighbors of TokenSynth and RWC samples from the timber traits ground truth are copied in `experiments/synthesizer_assessment/results/`.
 
 ## Reproducing Results
 To reproduce all results from the paper:

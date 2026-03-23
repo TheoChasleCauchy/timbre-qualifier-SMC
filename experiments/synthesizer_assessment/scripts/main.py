@@ -7,6 +7,8 @@ from compute_synthesized_samples_metadata import compute_synth_metadata
 from compute_synthesized_samples_embeddings import compute_embeddings
 from compute_embeddings_metadata import compute_synthesized_samples_embeddings_metadata
 from compute_predictions_metrics import compute_predictions_metrics
+from TokenSynth_nearest_and_furthest_neighbors import tokenSynth_nearest_and_furthest_neighbors
+from RWC_nearest_and_furthest_neighbors import RWC_nearest_and_furthest_neighbors
 import random
 import numpy as np
 import torch
@@ -29,14 +31,16 @@ def main():
     patience = config["patience"]
     epochs = config["epochs"]
 
-    train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patience, epochs)
-    compute_mean_embeddings()
-    create_midi_files()
-    synthesize_all(seed)
-    compute_synth_metadata()
-    compute_embeddings(embeddings_type)
-    compute_synthesized_samples_embeddings_metadata(embeddings_type)
-    compute_predictions_metrics(embeddings_type, hidden_layers)
+    # train_model(embeddings_type, hidden_layers, learning_rate, batch_size, patience, epochs)
+    # compute_mean_embeddings()
+    # create_midi_files()
+    # synthesize_all(seed)
+    # compute_synth_metadata()
+    # compute_embeddings(embeddings_type)
+    # compute_synthesized_samples_embeddings_metadata(embeddings_type)
+    # compute_predictions_metrics(embeddings_type, hidden_layers)
+    tokenSynth_nearest_and_furthest_neighbors()
+    RWC_nearest_and_furthest_neighbors()
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,7 @@ import torch
 from scipy.linalg import sqrtm
 import numpy as np
 
-def compute_predictions(embeddings_type, model_hidden_layers, hidden_layers_suffix):
+def compute_predictions_on_TokenSynth(embeddings_type, model_hidden_layers, hidden_layers_suffix):
     embeddings_type = embeddings_type + "_embeddings"
     # Model structure
     match embeddings_type:
@@ -55,6 +55,54 @@ def compute_predictions(embeddings_type, model_hidden_layers, hidden_layers_suff
         df = pd.DataFrame(df)
         os.makedirs(f"experiments/synthesizer_assessment/results/{condition_type}_conditioned_synthesis/", exist_ok=True)
         df.to_csv(f"experiments/synthesizer_assessment/results/{condition_type}_conditioned_synthesis/{condition_type}_predictions.csv", index=False)
+
+def compute_predictions_on_RWC(embeddings_type, model_hidden_layers, hidden_layers_suffix):
+    embeddings_type = embeddings_type + "_embeddings"
+    # Model structure
+    match embeddings_type:
+        case "clap_embeddings":
+            input_size = 512
+        case "clap-music_embeddings":
+            input_size = 512
+        case "vggish_embeddings":
+            input_size = 128
+        case "mert_embeddings":
+            input_size = 768
+        case _:
+            raise ValueError(f"Unsupported embedding type: {embeddings_type}")
+    output_size = 20 # 20 timber traits
+    
+    model_save_path = f"models/synthesizer_assessment/timbre_model_{embeddings_type}_{hidden_layers_suffix}"
+    
+    dataset_path = f"data/metadata/RWC/clap_embeddings/{embeddings_type}_labels.csv"
+    dataset = pd.read_csv(dataset_path)
+    timbre_traits_names = dataset.columns[2:].tolist() 
+    df = []
+
+    # Compute the predicted values for each sample (row) of the dataset and add it to the dataFrame
+    for row in tqdm(dataset.itertuples(index=False), total=len(dataset), desc=f"Computing predictions for all samples of RWC"):
+        instrument = row.Instrument
+
+        model = TimbreMLP.load_model(
+            f"{model_save_path}/timbre_mlp.pth",
+            input_size=input_size,
+            hidden_sizes=model_hidden_layers,
+            output_size=output_size,
+        )
+        
+        _, evalDataloader = SamplesDataset.create_dataloader(df=pd.DataFrame([row]), batch_size=1)
+
+        _, predicted_values, _ = model.evaluate_model(evalDataloader)
+
+        df.append({
+            "Sample": row.Path,
+            "Instrument": instrument,
+            **{timber_trait: predicted_values[:,timber_trait_id].item() for timber_trait_id, timber_trait in enumerate(timbre_traits_names)}  # Skip first two columns (Sample and Instrument)
+        })
+    
+    df = pd.DataFrame(df)
+    os.makedirs(f"experiments/synthesizer_assessment/results/RWC/", exist_ok=True)
+    df.to_csv(f"experiments/synthesizer_assessment/results/RWC/RWC_predictions.csv", index=False)
 
 def compute_errors():
     for condition_type in ["text", "audio", "text_audio"]:
@@ -215,7 +263,8 @@ def compute_predictions_metrics(embeddings_type: str, model_hidden_layers: list)
         case _:
             hidden_layers_suffix = f"{len(model_hidden_layers)}_hidden_layers"
 
-    compute_predictions(embeddings_type, model_hidden_layers, hidden_layers_suffix)
+    compute_predictions_on_TokenSynth(embeddings_type, model_hidden_layers, hidden_layers_suffix)
+    compute_predictions_on_RWC(embeddings_type, model_hidden_layers, hidden_layers_suffix)
     compute_errors()
     get_MAE_per_instrument()
     compute_fad_RWC_Synth(embeddings_type)
