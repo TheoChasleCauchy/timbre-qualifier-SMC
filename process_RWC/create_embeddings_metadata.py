@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-def compute_synthesized_samples_embeddings_metadata():
+def create_embeddings_metadata():
 
     print("[INFO] Creating embeddings metadata.")
 
